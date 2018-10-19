@@ -37,7 +37,7 @@ Please create a docker compose file which fulfills the following requirements:
 
 You can startup the docker compose with
 
-    docker-compose -f sock-shop-compose.yml up -d
+    docker-compose -f sock-shop-compose-mini.yml up -d
 
 ## Test
 
