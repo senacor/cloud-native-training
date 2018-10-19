@@ -48,7 +48,7 @@ and the catalogue under the URL:
 
 And will see the following shop page:
 
-![sock-shop-minimal](../docs/images/sock-shop-minimal.png)
+![sock-shop-minimal](../docs/images/sock-shop-minimal-screenshot.png)
 
 ## Optional
 
