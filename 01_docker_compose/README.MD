@@ -11,7 +11,7 @@ accessible with http://localhost on you local machine.
 To not overload the example, we are just using as smaller set of the
 sock-shop example like this:
 
-![sock-shop-small](../docs/images/sock-shop-small.png)
+![sock-shop-small](../docs/images/sock-shop-minimal.png)
 
 Please use the following docker images:
 * weaveworksdemos/edge-router:0.1.1
@@ -39,13 +39,16 @@ You can startup the docker compose with
 
     docker-compose -f sock-shop-compose.yml up -d
 
-
 ## Test
 
 After the docker compose is successfully started you can browse the shop
 and the catalogue under the URL:
 
      http://localhost
+
+And will see the following shop page:
+
+![sock-shop-minimal](../docs/images/sock-shop-minimal.png)
 
 ## Optional
 
