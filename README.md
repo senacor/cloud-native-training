@@ -4,15 +4,13 @@
 
 ### Required Installations
 
-For this training you will need the following software installed on your system
+For this training you will need the following software installed on your system. Download and install them:
 
 * Docker (for Mac, PC, Linux, ...), see https://docs.docker.com/install/
 * Minikube, see https://kubernetes.io/docs/tasks/tools/install-minikube/
 * Virtualbox, see https://www.virtualbox.org/
 
-Make sure that you have the newest versions of these tools, if you installed before.
-
-We recommend use minikube and virtualbox as this tried and tested with our examples, especially our istio examples can be tricky if you try that with other setups, e.g. by running kubernetes on docker. 
+If you already have them installed, make sure that you have the newest versions of these tools, or update them if not.
 
 ### Setup Tasks
 
@@ -28,7 +26,7 @@ minikube start --memory=8192 --cpus=4 --kubernetes-version=v1.10.0 --vm-driver=v
 # get instructions how to connect to minikube with docker
 minikube docker-env
 
-# do as suggested. For linux this is eval $(minikube docker-env), 
+# do as suggested. For linux or mac this is eval $(minikube docker-env), 
 # for windows something like @FOR /f "tokens=*" %i IN ('minikube docker-env') DO @%i
 eval $(minikube docker-env)
 
