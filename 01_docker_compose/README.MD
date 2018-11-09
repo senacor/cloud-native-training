@@ -11,7 +11,7 @@ accessible with http://localhost on you local machine.
 To not overload the example, we are just using as smaller set of the
 sock-shop example like this:
 
-![sock-shop-small](../docs/images/sock-shop-minimal.png)
+![sock-shop-minimal-new](../docs/images/sock-shop-minimal-new.png)
 
 Please use the following docker images:
 * weaveworksdemos/edge-router:0.1.1
