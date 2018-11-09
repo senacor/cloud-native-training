@@ -4,6 +4,7 @@ FROM alpine:3.5
 ENV KUBECTL_VERSION 1.11.1
 ENV KOPS_VERSION 1.10.0
 ENV HELM_VERSION 2.10.0
+ENV ISTIO_VERSION 1.0.3
 
 #install kubectl
 RUN apk add --update \
@@ -48,6 +49,14 @@ RUN apk add --update --no-cache python \
     awscli kube-shell --ignore-installed \
     && rm -r /root/.cache
 
+#install kompose
+#go get only supports latest and alpine does not work well with go binaries but latest should be fine
+RUN apk add git go musl-dev && GOPATH=/ go get -u github.com/kubernetes/kompose
+
+#install istioctl
+
+RUN curl -s -L https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istio-${ISTIO_VERSION}-linux.tar.gz | tar xzf - \
+    && ln -s $(pwd)/istio-${ISTIO_VERSION}/bin/istioctl /usr/bin
 
 WORKDIR /project
 
