@@ -10,6 +10,8 @@ There is a `docker-compose.yaml` file in this folder. You can replace that with 
 We don't use it with kubernetes.
 2. Run `kompose convert`
 3. Review the created files
+4. Create a namespace with `kubectl create namespace sock-shop`
+5. Select namespace with `kubectl config set-context minikube --namespace=sock-shop`
 4. Deploy to minikube by running `kubectl apply -f .`
 5. Check if the deployment runs smoothly
 
@@ -82,4 +84,4 @@ Connecting to localhost:80 (127.0.0.1:80)
 1. Scale up the front-end and catalog deployment and see what happens
 2. Kill a pod and see what happens
 3. Create a volume for the catalog-db and redeploy
-
+
