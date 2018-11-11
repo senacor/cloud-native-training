@@ -1,0 +1,39 @@
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: RbacConfig
+metadata:
+  name: default
+spec:
+  mode: 'ON_WITH_INCLUSION'
+  inclusion:
+    namespaces: ["sock-shop"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: service-user
+spec:
+  rules:
+  - services: ["front-end.sock-shop.svc.cluster.local", "catalogue.sock-shop.svc.cluster.local", "catalogue-db.sock-shop.svc.cluster.local"]
+    methods: ["*"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: bind-any-user
+spec:
+  subjects:
+  - user: "*"
+  roleRef:
+    kind: ServiceRole
+    name: "service-user"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: bind-specific-user
+spec:
+  subjects:
+  - user: "cluster.local/ns/sock-shop/sa/catalogue"
+  roleRef:
+    kind: ServiceRole
+    name: "service-user"
