@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: front-end
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    app: front-end
+    version: v1
+  name: front-end
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: front-end
+    spec:
+      serviceAccountName: front-end
+      containers:
+      - image: weaveworksdemos/front-end:0.3.12
+        name: front-end
+        ports:
+        - containerPort: 8079
+        livenessProbe:
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:8079/
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:8079/
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources: {}
+      hostname: front-end
+      restartPolicy: Always
+status: {}
