@@ -63,4 +63,7 @@ $ minikube service list
 
 Pick the first one which in above script is `http://192.168.99.100:31380` and connect to it. You should get the sock-shop.
 
+Hint: if your pods don't come to their feet disable the probes temporarily. 
+
+
 
