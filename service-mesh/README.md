@@ -12,18 +12,17 @@ Deploy istio service mesh in your kubernetes.
 
 ##### First startup minikube and connect to it:
 
-1. Start your minikube instance if not done yet or stopped
-2. Connect your docker environment to minikube in your shell by executing `minikube docker-env` and doing what it says. 
-You must do that each time you open a new shell.
-3. Run the cloudnative_bash docker image to get a shell with kubectl command in it. The following commands must be executed there. 
-4. Wait until the minikube is started completely. You can check by executing `kubectl get pods --all-namespaces`, 
+1. Make sure your minikube instance is started and your docker environment is connected as `minikube docker-env` says
+2. Run the cloudnative_bash docker image to get a shell and have the `kubectl` command 
+3. Make sure the minikube is started completely. You can check by executing `kubectl get pods --all-namespaces`, 
 all pods should be in status running 
+4. Make sure your sock-shop is still running. 
 
 ##### Next deploy istio
 
 5. Run the script `deploy_istio.sh` from this folder. It will install istio in your minikube cluster
 6. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
-all pods should be in status running 
+all pods should be in status Running or Completed. Don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
 
 ## Step 2 - Enable ISTIO for your Deployments
 
@@ -39,13 +38,14 @@ to be a problem with istio.
 For the deployments front-end and catalogue, inject the istio sidecar into the deployment like this:
 
 ```
-$ kubectl get deployment DEPLOYMENT_NAME -o yaml | istioctl kube-inject -f - | kubectl apply -f -
+kubectl get deployment catalogue -o yaml | istioctl kube-inject -f - | kubectl apply -f -
+kubectl get deployment front-end -o yaml | istioctl kube-inject -f - | kubectl apply -f -
 ```
 
 Alternatively directly invoke from the file
 
 ```
-$ istioctl kube-inject -f DEPLOYMENT_FILE | kubectl apply -f -
+istioctl kube-inject -f DEPLOYMENT_FILE | kubectl apply -f -
 ```
 
 Now run `kubectl get pods`. It should now show that for catalogue and front-end there are 2 containers instead of one
