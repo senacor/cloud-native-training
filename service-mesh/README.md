@@ -1,87 +1,66 @@
-# Exercise 2
+# Exercise 4
 
-Create Kubernetes ressource files for the Sock-Shop. Do so by using the kubernetes kompose tool, which takes an docker-compose.yaml file as input and creates kubernetes files. 
+This exercise is about installing istio service mesh in your kubernetes installation on minikube and using some of its features in combination with your sock-shop setup:
 
-There is a `docker-compose.yaml` file in this folder. You can replace that with your version if you like. 
+* Tracing
+* A/B Deployments
+* Authorization
 
 ## Step 1
 
-1. Slim down your docker-compose file, remove edge-router if still in.
-We don't use it with kubernetes.
-2. Run `kompose convert`
-3. Review the created files
-4. Create a namespace with `kubectl create namespace sock-shop`
-5. Select namespace with `kubectl config set-context minikube --namespace=sock-shop`
-4. Deploy to minikube by running `kubectl apply -f .`
-5. Check if the deployment runs smoothly
+Deploy istio service mesh in your kubernetes.
 
-Note: if you run `kubectl apply -f .` this might find your docker-compose.yaml file in the current folder and complain about it not having an api. Kubectl will ignore that and so can you. 
+##### First startup minikube and connect to it:
 
-To check if you did all right, check if the pods did start
+1. Start your minikube instance if not done yet or stopped
+2. Connect your docker environment to minikube in your shell by executing `minikube docker-env` and doing what it says. 
+You must do that each time you open a new shell.
+3. Run the cloudnative_bash docker image to get a shell with kubectl command in it. The following commands must be executed there. 
+4. Wait until the minikube is started completely. You can check by executing `kubectl get pods --all-namespaces`, 
+all pods should be in status running 
 
-```
-$ kubectl get pods
-NAME                            READY     STATUS    RESTARTS   AGE
-catalogue-67f85bd666-28zll      1/1       Running   0          9m
-catalogue-db-5cc5c5b4b6-s8lkn   1/1       Running   0          9m
-front-end-74464645d-mfwh7       1/1       Running   0          36s
-```
+##### Next deploy istio
 
-The pods should be in status "Running".
-
-Now lets check if we can access the service. 
-
-```
-$ minikube service list
-|-------------|----------------------|-----------------------------|
-|  NAMESPACE  |         NAME         |             URL             |
-|-------------|----------------------|-----------------------------|
-| default     | kubernetes           | No node port                |
-| kube-system | kube-dns             | No node port                |
-| kube-system | kubernetes-dashboard | No node port                |
-| sock-shop   | catalogue            | No node port                |
-| sock-shop   | catalogue-db         | No node port                |
-| sock-shop   | front-end            | No node port                |
-|-------------|----------------------|-----------------------------|
-```
-
-No node port yet - we do it in the next task
+5. Run the script `deploy_istio.sh` from this folder. It will install istio in your minikube cluster
+6. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
+all pods should be in status running 
 
 ## Step 2
 
-1. Update the front-end service to be of type node port
-2. redeploy
-3. run the `minikube service list` again
+This step is about migrating the sock-shop application to istio. This is necessary as istio will modify the deployments, 
+so we need to install them again.
 
-Now there should be an URL. Access that and you should see the socks shop
+##### Basic Deployment
 
-## Step 3
+1. Undeploy your sock-shop application. This is because the istio setup will break things. Run `undeploy.sh` script 
+2. Recreate the sock-shop namespace with automatic istio injection enabled and some basic elements. 
+Run the `deploy_basic.sh` script
 
-1. Update the deployments to contain valid probes for the font-end as well as the catalog-db service
-2. Redeploy
-3. Check that all pods come up in status "READY 1/1". This will take longer, depending on your settings on the probes. 
+##### Redeploy the sock-shop
 
-For testing, you can access your pods to find out ports etc like this:
+3. Redeploy the sock-shop
+4. Wait until the pods are started
+
+##### Find the ingress gateway
+
+We cannot use the NodePort as istio will block it. We need to use an ISTIO gateway now.
+Run `minikube service list` from a commandline outside of docker to find it.
 
 ```
-$ kubectl get pods
-NAME                            READY     STATUS    RESTARTS   AGE
-catalogue-67f85bd666-28zll      1/1       Running   0          13m
-catalogue-db-5cc5c5b4b6-s8lkn   1/1       Running   0          13m
-front-end-74464645d-mfwh7       1/1       Running   0          5m
+$ minikube service list
+|--------------|--------------------------|--------------------------------|
+|  NAMESPACE   |           NAME           |              URL               |
+|--------------|--------------------------|--------------------------------|
+| default      | kubernetes               | No node port                   |
+...
+| istio-system | istio-ingressgateway     | http://192.168.99.100:31380    |
+|              |                          | http://192.168.99.100:31390    |
+|              |                          | http://192.168.99.100:31400    |
+|              |                          | http://192.168.99.100:31765    |
+....
 
-$ kubectl exec -it catalogue-67f85bd666-28zll sh
-
-/ $ wget http://localhost:80/health -O-
-
-Connecting to localhost:80 (127.0.0.1:80)
-{"health":[{"service":"catalogue","status":"OK","time":"2018-11-08 16:36:36.336317212 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-08 16:36:36.336541455 +0000 UTC"}]}
--                    100% |*******************************|   190   0:00:00 ETA
 ```
 
-## Optional Steps 4
+Pick the first one which in above script is `http://192.168.99.100:31380` and connect to it. You should get the sock-shop.
 
-1. Scale up the front-end and catalog deployment and see what happens
-2. Kill a pod and see what happens
-3. Create a volume for the catalog-db and redeploy
 
