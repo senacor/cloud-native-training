@@ -24,16 +24,18 @@ script:
 
     ./buildCloudnativeBash.sh
 
-# Useage
+# Usage
 
 To use this bash run the following command in the project folder to
-start the bash with your project:
+start the bash with your project.
 
-    docker run -it -v ${pwd}:/project -v $HOME/.aws:/root/.aws:ro -v $HOME/.ssh:/root/.ssh:ro -v $HOME/.kube:/root/.kube  cloudnative_bash:latest
+    docker run -it -v $(pwd):/project -v $HOME/.minikube:$HOME/.minikube -v $HOME/.aws:/root/.aws:ro -v $HOME/.ssh:/root/.ssh:ro -v $HOME/.kube:/root/.kube  cloudnative_bash:latest
 
 This command contains some volume bindings:
 *  -v ${pwd}:/project : Bind the current folder as /project folder
    inside the container
+*  -v $HOME/.minikube:$HOME/.minikube: Bind the credentials created
+   by minishift into the container in the same path as created.
 *  -v $HOME/.aws:/root/.aws:ro : Bind you AWS credentions read-only to
    the container
 *  -v $HOME/.ssh:/root/.ssh:ro : Bind you ssh creadentials read-only to
