@@ -23,15 +23,19 @@ spec:
         ports:
         - containerPort: 80
         livenessProbe:
-          httpGet:
-            path: /health
-            port: 80
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:80/healthz
           initialDelaySeconds: 60
           periodSeconds: 30
         readinessProbe:
-          httpGet:
-            path: /health
-            port: 80
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:80/healthz
           initialDelaySeconds: 30
           periodSeconds: 10
         resources: {}

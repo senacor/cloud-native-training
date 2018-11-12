@@ -23,15 +23,19 @@ spec:
         ports:
         - containerPort: 8079
         livenessProbe:
-          httpGet:
-            path: /
-            port: 8079
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:8079
           initialDelaySeconds: 60
           periodSeconds: 30
         readinessProbe:
-          httpGet:
-            path: /
-            port: 8079
+          exec:
+            command:
+            - wget
+            - -O-
+            - http://localhost:8079
           initialDelaySeconds: 30
           periodSeconds: 10
         resources: {}
