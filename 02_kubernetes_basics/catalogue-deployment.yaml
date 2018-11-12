@@ -27,7 +27,7 @@ spec:
             command:
             - wget
             - -O-
-            - http://localhost:80/healthz
+            - http://localhost:80/health
           initialDelaySeconds: 60
           periodSeconds: 30
         readinessProbe:
@@ -35,7 +35,7 @@ spec:
             command:
             - wget
             - -O-
-            - http://localhost:80/healthz
+            - http://localhost:80/health
           initialDelaySeconds: 30
           periodSeconds: 10
         resources: {}
