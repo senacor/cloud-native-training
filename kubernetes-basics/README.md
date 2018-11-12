@@ -6,7 +6,7 @@ There is a `docker-compose.yaml` file in this folder. You can replace that with 
 
 ## Step 1
 
-1. start minishift if not done yet: See script `start_minikube.sh`
+1. start minikue if not done yet: See script `start_minikube.sh`
 2. Connect your docker environment to minikube in your shell by executing `minikube docker-env` and doing what it says. 
 You must do that each time you open your shell. 
 3. Slim down your docker-compose file, remove edge-router if still in.
