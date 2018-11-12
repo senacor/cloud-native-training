@@ -1,3 +1,11 @@
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "catalogue"
+spec:
+  targets:
+  - name: catalogue
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:

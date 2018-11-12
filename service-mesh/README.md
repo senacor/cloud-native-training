@@ -4,7 +4,7 @@ This exercise is about installing istio service mesh in your kubernetes installa
 
 * Tracing
 * A/B Deployments
-* Authorization
+* Authentication
 
 ## Step 1 - Deploy ISTIO
 
@@ -133,9 +133,9 @@ Next update the rule so that 10 % of all traffic is routed to the v2 version.
 See file `catalogue-virtual-service.yaml` for a start. Update that service for above rules. 
 See https://istio.io/docs/tasks/traffic-management/traffic-shifting/ on how to do that.
 
-# Step 5 - Enable Authorization
+# Step 5 - Enable Authentication
 
-In this step we will add authorization into the service in order to control traffic between services.
+In this step we will add authentication into the service in order to control traffic between services.
 
 ##### Start Simple Hacking Test
 
@@ -168,10 +168,19 @@ This shows the service is still accessible. Bad.
 
 ##### Enable Authentication
 
-Enable Authentication by applying the provided file `catalogue-virtual-service-auth.yaml`
+Enable Authentication by modifying the file `catalogue-virtual-service.yaml` and redeploying it.
+You need to enable mutual tls by adding ISTIO_MUTUAL to the policy
 
 ```
-$ kubectl apply -f catalogue-virtual-service-auth.yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: catalogue
+spec:
+  host: catalogue
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
 ```
 
 Again try our hacking
@@ -181,36 +190,42 @@ $ curl  http://192.168.99.100:32237/health
 curl: (56) Recv failure: Connection reset by peer
 ```
 
-Good, simple hacking disabled!
+Good, simple hacking disabled! But lets see if the sock-shop is still working. I guess not...
 
-##### Startup Hacking Test
-
-Next we will start up an hacker which accesses the catalogue service by a backdoor. See folder `hacker`. Run `sh deploy.sh` there
-, wait a few seconds until the hacker pod is deployed and then run `sh getlog.sh` in a second terminal.
-
-You will see this output 
+To fix that we need to make sure that the front-end deployment also enables mtls when communicating with the catalogue service.
+To do so, add a policy like this:
 
 ```
-hacking catalogue
-Connecting to catalogue.sock-shop.svc.cluster.local (10.99.181.230:80)
-{"health":[{"service":"catalogue","status":"OK","time":"2018-11-12 11:27:33.182888783 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-12 11:27:33.182956893 +0000 UTC"}]}
--                    100% |*******************************|   190   0:00:00 ETA
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "catalogue"
+spec:
+  targets:
+  - name: catalogue
+  peers:
+  - mtls: {}
 ```
 
-It means that the hacker can access the catalogue service. Your job is to lock out that hacker.
+##### Do the same for front-end
 
-##### Enable Security
+Now apply the same principle to the front-end and enable mtls for it. 
+To make that working, you will also need to activate a gateway
 
-Next we will turn on authentication for the catalogue service. 
+Execute `kubectl apply -f front-end-gateway.yaml`
 
-Apply the provided file `rbac-permissive.yaml`. It will activate authentication, but has very relaxed rules.
+This will create an istio gateway which also has an envoy sidecar and can carry out mutual TLS for incoming connections.
+Find the address of the gateway by executing `minikube service list`:
 
 ```
-$ kubectl apply -f rbac-permissive.yaml
+...
+| istio-system | istio-ingressgateway   | http://192.168.99.100:31380    |
+|              |                        | http://192.168.99.100:31390    |
+|              |                        | http://192.168.99.100:31400    |
+|              |                        | http://192.168.99.100:32748    |
+
+...
 ```
 
-Have a look at https://istio.io/docs/tasks/security/role-based-access-control/ and find a way to lock out the hacker,
-without breaking the application.
-
-
-
+Now access the sock-shop with the first shown url, `http://192.168.99.100:31380` in above example.
+The sock-shop should be accessible. 
