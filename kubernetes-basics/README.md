@@ -6,14 +6,17 @@ There is a `docker-compose.yaml` file in this folder. You can replace that with 
 
 ## Step 1
 
-1. Slim down your docker-compose file, remove edge-router if still in.
+1. start minishift if not done yet: See script `start_minikube.sh`
+2. Connect your docker environment to minikube in your shell by executing `minikube docker-env` and doing what it says. 
+You must do that each time you open your shell. 
+3. Slim down your docker-compose file, remove edge-router if still in.
 We don't use it with kubernetes.
-2. Run `kompose convert`
-3. Review the created files
-4. Create a namespace with `kubectl create namespace sock-shop`
-5. Select namespace with `kubectl config set-context minikube --namespace=sock-shop`
-4. Deploy to minikube by running `kubectl apply -f .`
-5. Check if the deployment runs smoothly
+4. Run `kompose convert` from within the cloudnative_bash docker image 
+5. Review the created files
+6. Create a namespace with `kubectl create namespace sock-shop`
+7. Select namespace with `kubectl config set-context minikube --namespace=sock-shop`
+8. Deploy to minikube by running `kubectl apply -f .`
+9. Check if the deployment runs smoothly
 
 Note: if you run `kubectl apply -f .` this might find your docker-compose.yaml file in the current folder and complain about it not having an api. Kubectl will ignore that and so can you. 
 
