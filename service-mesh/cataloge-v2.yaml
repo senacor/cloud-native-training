@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: catalogue
+  name: catalogue-v2
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: catalogue
+        version: v2
+        io.kompose.service: catalogue
+    spec:
+      containers:
+      - image: nextstepman/catalogue:latest
+        name: catalogue
+        ports:
+        - containerPort: 80
+        resources: {}
+      hostname: catalogue
+      restartPolicy: Always
+status: {}
+

@@ -6,7 +6,8 @@ spec:
   targets:
   - name: catalogue
   peers:
-  - mtls: {}
+  - mtls:
+      mode: STRICT
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService

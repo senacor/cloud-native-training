@@ -13,7 +13,7 @@ metadata:
   name: service-user
 spec:
   rules:
-  - services: ["front-end.sock-shop.svc.cluster.local", "catalogue.sock-shop.svc.cluster.local", "catalogue-db.sock-shop.svc.cluster.local"]
+  - services: ["*"]
     methods: ["*"]
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -22,8 +22,7 @@ metadata:
   name: bind-any-user
 spec:
   subjects:
-  - properties:
-      source.namespace: "sock-shop"
+  - user: "cluster.local/ns/sock-shop/sa/catalogue"
   roleRef:
     kind: ServiceRole
-    name: "service-user"
+    name: service-user
