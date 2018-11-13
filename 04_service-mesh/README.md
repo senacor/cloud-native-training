@@ -304,7 +304,44 @@ kubectl apply -f rbac-permissive.yaml
 
 Check the socks shop again. All should be fine.
 
-####
+#### Try some hacking
+
+Now lets see if the services are still hackable. There is a folder `hacker` which starts up an container which tries
+to access the catalogue service. 
+
+Start it with
+```
+cd hacker
+sh deploy.sh
+```
+
+Wait a bit, next start this
+
+```
+sh getlog.sh
+```
+
+It will output something like this:
+
+```
+hacking catalogue
+Connecting to catalogue.sock-shop.svc.cluster.local (10.99.214.77:80)
+-                    100% |*******************************|   190   0:00:00 ETA
+{"health":[{"service":"catalogue","status":"OK","time":"2018-11-13 14:34:50.153683049 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-13 14:34:50.153690592 +0000 UTC"}]}
+```
+
+This shows, that the rogue hacker service can still access the catalogue service. The hacker will be authenticated, 
+but as the rules are permissive, still has access. 
+
+#### Get Authorizations right
+
+Your job is now to configure authorization right:
+
+* The front-end service should still be accessible
+* The catalogue service should only be accessible for the front-end service
+
+See https://istio.io/docs/tasks/security/role-based-access-control/ for more infos. The basic idea is that you will have 
+to add an service account to the front-end service and allow access to the catalogue service only for that. 
 
 
 
