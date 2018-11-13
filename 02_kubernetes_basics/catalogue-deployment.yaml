@@ -30,6 +30,7 @@ spec:
             - http://localhost:80/health
           initialDelaySeconds: 60
           periodSeconds: 30
+          failureThreshold: 5
         readinessProbe:
           exec:
             command:
@@ -37,7 +38,8 @@ spec:
             - -O-
             - http://localhost:80/health
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 20
+          failureThreshold: 10
         resources: {}
       hostname: catalogue
       restartPolicy: Always
