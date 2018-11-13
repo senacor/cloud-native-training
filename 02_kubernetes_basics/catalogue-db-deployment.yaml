@@ -17,10 +17,6 @@ spec:
       labels:
         io.kompose.service: catalogue-db
     spec:
-      volumes:
-      - name: catalogue-db-volume
-        persistentVolumeClaim:
-          claimName: catalogue-db-pvc
       containers:
       - env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
@@ -47,9 +43,6 @@ spec:
             - ping
           initialDelaySeconds: 5
           periodSeconds: 10
-        volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: catalogue-db-volume
       hostname: catalogue-db
       restartPolicy: Always
 status: {}
