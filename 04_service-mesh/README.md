@@ -332,7 +332,7 @@ Connecting to catalogue.sock-shop.svc.cluster.local (10.99.214.77:80)
 {"health":[{"service":"catalogue","status":"OK","time":"2018-11-13 14:34:50.153683049 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-13 14:34:50.153690592 +0000 UTC"}]}
 ```
 
-This shows, that the rogue hacker service can still access the catalogue service. Simply turning on Authentication as
+This shows, that the hacker component can still access the catalogue service. Simply turning on Authentication as
 done in the last step is not enough.
 
 #### Get Authorizations right
@@ -356,6 +356,3 @@ wget: server returned error: HTTP/1.1 403 Forbidden
 ```
 
 And the sock-shop should still work as usual.
-
-
-
