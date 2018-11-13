@@ -285,19 +285,20 @@ The reason is, that the RBAC feature in ISTIO will only work if the ports are na
 
 #### Enable RBAC
 
-Now lets blindly turn RBAC on. Run this script
+Lets blindly turn RBAC on and see what happens. Run this script
 
 ```
 kubectl apply -f rbac-on.yaml
 ```
 
-Now try to access the sock-shop. At first it might work, but after some time you will get this:
+Try to access the sock-shop. At first it might work, but after some time you will get this:
 
 ```
 RBAC: access denied
 ```
 
-Now lets do that in a more intelligent way. We will turn RBAC on but with an allow-all policy. Run this script:
+The reason is that RBAC has an deny-all default. 
+To deal with this, turn RBAC on but with an allow-all policy. Run this script:
 
 ```
 kubectl apply -f rbac-permissive.yaml
@@ -307,8 +308,8 @@ Check the socks shop again. All should be fine.
 
 #### Hack the Catalogue Service
 
-Now lets see if the services are still hackable. There is a folder `hacker` which starts up an container which tries
-to access the catalogue service. 
+Now test if the services are still hackable. There is a folder `hacker` which starts up an container which tries
+to access the catalogue service. It simply runs a wget in a loop and tries to access the catalogue service. 
 
 Start it with
 ```
@@ -336,7 +337,7 @@ done in the last step is not enough.
 
 #### Get Authorizations right
 
-Your job is now to configure authorization right:
+Your job is to configure authorization right:
 
 * The front-end service should still be accessible
 * The catalogue service should only be accessible for the front-end service
