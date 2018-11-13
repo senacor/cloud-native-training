@@ -123,6 +123,10 @@ $ minikube service list
 
 ```
 
+On AWS you will have to edit the jaeger service and set it to type LoadBalancer instead. 
+The LoadBalancer takes some seconds until started. You can find the URL of Jaeger in the service configuration.
+Note that Jaeger is exposed on port 16686, not 80.  
+
 Now open Jaeger at that URL.
 
 Invoke the sock-shop frontend. You should see traces. If not, make sure you got the requirements of ISTIO right and update your deployments and services.
@@ -197,6 +201,8 @@ $ minikube service list
 {"health":[{"service":"catalogue","status":"OK","time":"2018-11-12 11:45:27.038459778 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-12 11:45:27.038496267 +0000 UTC"}]}
 ```
 
+For AWS you will have to set the catalogue service to type LoadBalanncer instead. 
+
 This shows the service is easily accessible. Bad.
 
 #### Enable Authentication
@@ -261,7 +267,9 @@ Find the address of the gateway by executing `minikube service list`:
 ```
 
 Now access the sock-shop with the first shown url, `http://192.168.99.100:31380` in above example.
-The sock-shop should be accessible. The first is for port 80, so only the first one will work. 
+The sock-shop should be accessible. The first is for port 80, so only the first one will work.
+
+Above only works on minikube. For AWS simply skip that, it is an optional part. 
 
 ## Step 5 - Enable Authorization
 
@@ -332,8 +340,15 @@ Connecting to catalogue.sock-shop.svc.cluster.local (10.99.214.77:80)
 {"health":[{"service":"catalogue","status":"OK","time":"2018-11-13 14:34:50.153683049 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-13 14:34:50.153690592 +0000 UTC"}]}
 ```
 
-This shows, that the hacker component can still access the catalogue service. Simply turning on Authentication as
-done in the last step is not enough.
+if you get this, you should wait a bit until the hacker container is up:
+```
+error: expected 'logs (POD | TYPE/NAME) [CONTAINER_NAME]'.
+POD or TYPE/NAME is a required argument for the logs command
+See 'kubectl logs -h' for help and examples.
+```
+
+This shows, that the rogue hacker service can still access the catalogue service. The hacker will be authenticated, 
+but as the rules are permissive, still has access. 
 
 #### Get Authorizations right
 

@@ -48,6 +48,8 @@ $ minikube service list
 |-------------|----------------------|-----------------------------|
 ```
 
+Note, if you use AWS you would rather need expose the service with LoadBalancer. 
+
 This output shows that there is node port yet - so we cannot try out the sock-shop yet. We do it in the next task
 
 ## Step 2
