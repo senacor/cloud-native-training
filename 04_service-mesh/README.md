@@ -37,7 +37,10 @@ First make sure your services are still running. Access the sock-shop in the bro
 Next, you will migrate your front-end and catalogue services with istio. 
 
 There is a problem with istio concerning the catalogue-db service. This service uses TCP connections and this seems
-to be a problem with the current version of istio. 
+to be a problem with the current version of istio. Actually the problem is that ISTIO is trying to be too smart. By default
+it activates a so called mutual TLS feature and falls back to plain connections if this doesn't work. This feature works
+well with HTTP and other protocols which ISTIO knows, but for plain TCP this fails resulting in garbeled connections. 
+We will fix that in a later step.
 
 For the deployments front-end and catalogue, inject the istio sidecar into the deployment like this:
 
@@ -63,6 +66,26 @@ front-end-6596b6f7f7-vpv79     2/2       Running   0          54s
 ``` 
  
 Open the sock-shop again in your browser. It should still work. If not, make sure you didn't migrate the catalogue-db deployment.
+
+#### Let's fix the catalogue-db service
+
+To also enable the catalogue-db service with ISTIO we need a policy to tell istio to run mutual TLS with the catalogue-db all
+the time. Run this script:
+
+```
+kubectl apply -f catalogue-db-policy.yaml
+```
+
+After that, also run the kube-inject on the catalogue-db service
+
+```
+kubectl get deployment catalogue-db -o yaml | istioctl kube-inject -f - | kubectl apply -f -
+```
+
+Check again that the sock-shop still works.
+
+If you run into problems with this, this part is not essential You can delete the policy and revert back to the non-injected
+caralogue-db as a workaround.
  
 ## Step 3 - Let's do Tracing!
 
@@ -238,3 +261,51 @@ Find the address of the gateway by executing `minikube service list`:
 
 Now access the sock-shop with the first shown url, `http://192.168.99.100:31380` in above example.
 The sock-shop should be accessible. The first is for port 80, so only the first one will work. 
+
+## Step 5 - Enable Authorization
+
+Now lets play with authorization. 
+
+#### Make sure the ports are named
+
+It is essential that your services define their ports with the correct name which is one
+of the requirements of ISTIO. 
+
+You can check like this:
+
+```
+kubectl get service front-end -o=jsonpath="----- {.spec.ports[].name} -----"
+kubectl get service catalogue -o=jsonpath="----- {.spec.ports[].name} -----"
+kubectl get service catalogue-db -o=jsonpath="----- {.spec.ports[].name} -----"
+``` 
+
+If it outputs `----- http -----` for front-end and catalogue and something else for the catalogue-db then all is well.
+The reason is, that the RBAC feature in ISTIO will only work if the ports are named correctly. 
+
+#### Enable RBAC
+
+Now lets blindly turn RBAC on. Run this script
+
+```
+kubectl apply -f rbac-on.yaml
+```
+
+Now try to access the sock-shop. At first it might work, but after some time you will get this:
+
+```
+RBAC: access denied
+```
+
+Now lets do that in a more intelligent way. We will turn RBAC on but with an allow-all policy. Run this script:
+
+```
+kubectl apply -f rbac-permissive.yaml
+```
+
+Check the socks shop again. All should be fine.
+
+####
+
+
+
+

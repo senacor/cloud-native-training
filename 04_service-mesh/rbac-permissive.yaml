@@ -26,14 +26,3 @@ spec:
   roleRef:
     kind: ServiceRole
     name: "service-user"
----
-apiVersion: "rbac.istio.io/v1alpha1"
-kind: ServiceRoleBinding
-metadata:
-  name: bind-specific-user
-spec:
-  subjects:
-  - user: "cluster.local/ns/sock-shop/sa/catalogue"
-  roleRef:
-    kind: ServiceRole
-    name: "service-user"
