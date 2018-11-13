@@ -13,6 +13,21 @@ previous installes application in you AWS HA Kubernetes cluster.
 
 ![kops install](../docs/images/kops_install.png)
 
+## Prerequisite
+
+Make sure that the credentials are set in file: ~/.aws/credentials
+
+     [senacor]
+     aws_access_key_id = xxx
+     aws_secret_access_key = yyy
+
+Make sure that the correct profile configuration is set in file: ~/.aws/config
+
+     [profile senacor]
+     region = eu-central-1
+
+
+
 ## Task:
 
 * Choose the fitting DNS name for you team: team(1-5).cloudnative.senacor.com
