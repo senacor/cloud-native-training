@@ -6,6 +6,7 @@ some of its features in combination with your sock-shop setup:
 * Tracing
 * A/B Deployments
 * Authentication
+* Authorization
 
 Use your minikube installation for that, not AWS.
 
