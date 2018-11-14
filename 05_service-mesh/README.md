@@ -1,4 +1,4 @@
-# Exercise 4 - Getting Started with Service-Meshes
+# Exercise 5 - Getting Started with Service-Meshes
 
 In this exercise you will be installing the ISTIO service mesh in your kubernetes installation on minikube and use
 some of its features in combination with your sock-shop setup:
