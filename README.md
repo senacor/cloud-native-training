@@ -41,3 +41,17 @@ docker pull weaveworksdemos/front-end:0.3.12
 minikube stop 
 
 ```
+# AWS credentials
+
+Make sure that the credentials are set in file: ~/.aws/credentials
+
+     [senacor]
+     aws_access_key_id = xxx
+     aws_secret_access_key = yyy
+
+Make sure that the correct profile configuration is set in file: ~/.aws/config
+
+     [profile senacor]
+     region = eu-central-1
+
+
