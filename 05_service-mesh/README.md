@@ -170,10 +170,12 @@ kind: Deployment
 metadata:
   labels:
     app: catalogue
+###### note the name here ######    
   name: catalogue-v2
 spec:
   template:
     metadata:
+###### note the version label here ######    
       labels:
         app: catalogue
         version: v2
