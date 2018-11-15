@@ -5,12 +5,18 @@ some of its features in combination with your sock-shop setup:
 
 * Tracing
 * A/B Deployments
-* Authentication
-* Authorization
+* Authentication and Authorization
 
-Use your minikube installation for that, not AWS.
+The 3 exercise groups are optional. You can either do Tracing, A/B Deployments
+or Authentication and Authorization. The last one is the most difficult one.
 
-## Step 1 - Deploy ISTIO
+You can do them in any order, but you must do first Authentication, next Authorization. 
+
+
+You can use your AWS installation for all exercises.
+
+
+## Required Step 1 - Deploy ISTIO
 
 Deploy istio service mesh in your kubernetes.
 
@@ -28,7 +34,7 @@ all pods should be in status Running or Completed. Don't worry if some show Erro
 6. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
 all pods should be in status Running or Completed. Again don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
 
-## Step 2 - Enable ISTIO for your Deployments
+## Required Step 2 - Enable ISTIO for your Deployments
 
 This step is about migrating the sock-shop application to istio. This is necessary as istio requires to modify the deployments, 
 so we need to install them again.
@@ -43,17 +49,12 @@ it activates a so called mutual TLS feature and falls back to plain connections 
 well with HTTP and other protocols which ISTIO knows, but for plain TCP this fails resulting in garbeled connections. 
 We will fix that in a later step.
 
-For the deployments front-end and catalogue, inject the istio sidecar into the deployment like this:
+For the deployments front-end, catalogue and catalog-db, inject the istio sidecar into the deployment like this:
 
 ```
 kubectl get deployment catalogue -o yaml | istioctl kube-inject -f - | kubectl apply -f -
 kubectl get deployment front-end -o yaml | istioctl kube-inject -f - | kubectl apply -f -
-```
-
-Alternatively directly invoke from the file
-
-```
-istioctl kube-inject -f DEPLOYMENT_FILE | kubectl apply -f -
+kubectl get deployment catalogue-db -o yaml | istioctl kube-inject -f - | kubectl apply -f -
 ```
 
 Now run `kubectl get pods`. It should now show that for catalogue and front-end there are 2 containers instead of one
@@ -62,68 +63,92 @@ Now run `kubectl get pods`. It should now show that for catalogue and front-end 
 $ kubectl get pods
 NAME                           READY     STATUS    RESTARTS   AGE
 catalogue-7dfb86d5c9-bzc87     2/2       Running   0          1m
-catalogue-db-f4c8fcc4b-n5z7l   1/1       Running   0          8m
+catalogue-db-f4c8fcc4b-n5z7l   2/2       Running   0          8m
 front-end-6596b6f7f7-vpv79     2/2       Running   0          54s
 ``` 
  
-Open the sock-shop again in your browser. It should still work. If not, make sure you didn't migrate the catalogue-db deployment.
-
-#### Let's fix the catalogue-db service
-
-To also enable the catalogue-db service with ISTIO we need a policy to tell istio to run mutual TLS with the catalogue-db all
-the time. Run this script:
+Still one more thing to do. The catalogue-db service needs some special handling, as it is a TCP service. Run this script:
 
 ```
 kubectl apply -f catalogue-db-policy.yaml
 ```
 
-After that, also run the kube-inject on the catalogue-db service
-
-```
-kubectl get deployment catalogue-db -o yaml | istioctl kube-inject -f - | kubectl apply -f -
-```
-
-Check again that the sock-shop still works.
-
-If you run into problems with this, this part is not essential You can delete the policy and revert back to the non-injected
-caralogue-db as a workaround.
- 
-## Step 3 - Let's do Tracing!
+Now check that the sock-shop still works, before doing the part:
 
 #### Make sure your Deployments match the ISTIO Requirements 
 
-To get started, make sure your deployments and service follow the ISTIO requirements.
+Before proceeding to one of the following optional steps, make sure your deployments and service follow the ISTIO requirements.
 See https://istio.io/docs/setup/kubernetes/spec-requirements/ and fix your deployments.
 
 Basically the requirements are about having certain labels. Make sure you also fix the selectors in the service
 definitions, otherwise you might break the sock-shop.
 
+In short: your yaml files must define labels app: and version: for your deployments and services. Make sure to also fix the 
+service selector correctly. Also make sure the ports in catalogue and catalogue-db are named "http".
+
+Example:
+
+```
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: catalogue
+  name: catalogue
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: catalogue
+        version: v1
+...       
+
+```
+
+Note that the deployment has the version only in the template, not on the deployment itself.
+
+And the service must match, example:
+```
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: catalogue
+  name: catalogue
+spec:
+  type: NodePort
+  ports:
+  - name: "http"
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: catalogue
+status:
+  loadBalancer: {}
+```
+
+Note that the service does not show the version in the selector, only the deployment.
+
 Redeploy the modifications and open the sock-shop again in your browser. It should still work. 
 If not, make sure you got the selectors in the services right.
+ 
+## Optional Step 3 - Let's do Tracing!
 
 #### Use Jaeger for Tracing
 
-Now connect to the Jaeger frontend. It is already started in ISTIO, but not visible.
-Run this command to expose it:
+Connect to the Jaeger frontend. It is already started in ISTIO, but not visible.
+Run this command to expose it via a LoadBalancer:
 
 ```
 kubectl apply -f jaeger-service.yaml
 ```
 
-Now run `minikube service list` to find the exposed port:
-
-```
-$ minikube service list
-|--------------|--------------------------|--------------------------------|
-|  NAMESPACE   |           NAME           |              URL               |
-|--------------|--------------------------|--------------------------------|
-...
-| istio-system | jaeger                   | http://192.168.99.100:32737    |
-...
-
-```
-
-On AWS you will have to edit the jaeger service and set it to type LoadBalancer instead. 
 The LoadBalancer takes some seconds until started. You can find the URL of Jaeger in the service configuration.
 Note that Jaeger is exposed on port 16686, not 80.  
 
@@ -133,10 +158,14 @@ Invoke the sock-shop frontend. You should see traces. If not, make sure you got 
 
 If you want more background, Have a look at https://istio.io/docs/concepts/policies-and-telemetry/ for the concepts. 
 
-## Step 4 - A/B Deployments
+## Optional Step 4 - A/B Deployments
 
-Install a second catalogue deployment. There is an image `nextstepman/catalogue:latest` which you can use. 
-Make sure that the deployment defines version numbers for your pods like in the following snippet. 
+Install a second catalogue deployment. There is an image `nextstepman/catalogue:latest` which you can use. So just copy the 
+catalogue deployment, give it a different name and change the image.
+
+Make sure that the deployment defines a version number for your pods like in the following snippet. 
+Note that only the name is different, the labels still says `app: catalogue`. This is because 2 deployments
+cannot exist with the same name.
 
 ```
 apiVersion: extensions/v1beta1
@@ -151,14 +180,15 @@ spec:
       labels:
         app: catalogue
         version: v2
-  ...
+...
     spec:
       containers:
       - image: nextstepman/catalogue:latest
 ...
 ```
 
-Also update your first catalogue deployment to have the `version: v1` label in the pod template.
+Also update your first catalogue deployment to have the `version: v1` label in the pod template if not 
+done yet.
 
 Now deploy the `catalogue-virtual-service.yaml` file with `kubectl apply -f catalogue-virtual-service.yaml`. 
 You should now see that the catalogue-service flips between two versions, with v2 showing "***" on the catalogue entries, 
@@ -170,13 +200,13 @@ Next update the rule so that 10 % of all traffic is routed to the v2 version.
 See file `catalogue-virtual-service.yaml` for a start. Update that service for above rules. 
 See https://istio.io/docs/tasks/traffic-management/traffic-shifting/ on how to do that.
 
-## Step 5 - Enable Authentication
+## Optional Step 5 - Enable Authentication
 
 In this step you will add authentication into the service in order to control traffic between services.
 
 #### Start Simple Hacking Test
 
-Edit your catalogue service and change its type to NodePort:
+Edit your catalogue service and change its type to LoadBalancer:
 
 ```
 apiVersion: v1                                                                                                                                                                                                                                                
@@ -185,30 +215,26 @@ metadata:
   ..
 spec:                                                                                                                                                                                                                                                         
   ...
-  type: NodePort                                                                                                                                                                                                                                              
+  type: LoadBalancer                                                                                                                                                                                                                                              
 ```
 
 Make sure it contains the type: entry NodePort.
 
-After that see that the port is exposed with `minikube service list` and access it with curl.
+After that see the url which is exposed on AWS with `kubectl describe service catalogue`.
 
 ```
-$ minikube service list
-...
-| sock-shop    | catalogue                | http://192.168.99.100:32237    |
-...
-# curl  http://192.168.99.100:32237/health
+curl  http://blablablablablablabla-123456789.eu-central-1.elb.amazonaws.com/health
 {"health":[{"service":"catalogue","status":"OK","time":"2018-11-12 11:45:27.038459778 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-12 11:45:27.038496267 +0000 UTC"}]}
 ```
 
-For AWS you will have to set the catalogue service to type LoadBalanncer instead. 
-
-This shows the service is easily accessible. Bad.
+This shows the service can be make accessible easily. 
+Even if not exposed with a LoadBalancer, any other Container in the Kubernetes cluster could access it. 
 
 #### Enable Authentication
 
-Enable Authentication by modifying the file `catalogue-virtual-service.yaml` and redeploying it.
-You need to enable mutual TLS by adding ISTIO_MUTUAL to the policy
+Enable Authentication by modifying the file `catalogue-virtual-service.yaml`.
+You need to enable mutual TLS by adding ISTIO_MUTUAL to the DestinationRule like shown below and deploy it with 
+`kubectl apply -f catalogue-virtual-service.yaml`.
 
 ```
 apiVersion: networking.istio.io/v1alpha3
@@ -225,14 +251,14 @@ spec:
 Again try our hacking
 
 ```
-$ curl  http://192.168.99.100:32237/health
+$ curl  http://blablablablablablabla-123456789.eu-central-1.elb.amazonaws.com/health
 curl: (56) Recv failure: Connection reset by peer
 ```
 
 Good, simple hacking disabled! But lets see if the sock-shop is still working. I think not...
 
 To fix that we need to make sure that the front-end deployment also enables mutual TLS when communicating with the catalogue service.
-To do so, add a policy like this:
+To do so, add the policy in file catalogue-virtual-service.yaml like this:
 
 ```
 apiVersion: "authentication.istio.io/v1alpha1"
@@ -246,34 +272,13 @@ spec:
   - mtls: {}
 ```
 
-#### Do the same for front-end
+Again deploy the modified file with `kubectl apply -f catalogue-virtual-service.yaml`. 
 
-Now apply the same principle to the front-end and enable mutual TLS for it. 
-To make that working, you will also need to activate a gateway
+Now check the sock-shop again. It should work again, but the simple hacking should still be blocked. 
 
-Execute `kubectl apply -f front-end-gateway.yaml`
+## Optional Step 5 - Enable Authorization
 
-This will create an istio gateway which also has an envoy sidecar and can carry out mutual TLS for incoming connections.
-Find the address of the gateway by executing `minikube service list`:
-
-```
-...
-| istio-system | istio-ingressgateway   | http://192.168.99.100:31380    |
-|              |                        | http://192.168.99.100:31390    |
-|              |                        | http://192.168.99.100:31400    |
-|              |                        | http://192.168.99.100:32748    |
-
-...
-```
-
-Now access the sock-shop with the first shown url, `http://192.168.99.100:31380` in above example.
-The sock-shop should be accessible. The first is for port 80, so only the first one will work.
-
-Above only works on minikube. For AWS simply skip that, it is an optional part. 
-
-## Step 5 - Enable Authorization
-
-Now lets play with authorization. 
+Now lets play with authorization. This only works if you turned on Authentication already. If not, do that step first. 
 
 #### Make sure the ports are named
 
@@ -325,7 +330,7 @@ cd hacker
 sh deploy.sh
 ```
 
-Wait a bit, next start this
+Wait a a few seconds , next start this
 
 ```
 sh getlog.sh
@@ -340,15 +345,16 @@ Connecting to catalogue.sock-shop.svc.cluster.local (10.99.214.77:80)
 {"health":[{"service":"catalogue","status":"OK","time":"2018-11-13 14:34:50.153683049 +0000 UTC"},{"service":"catalogue-db","status":"OK","time":"2018-11-13 14:34:50.153690592 +0000 UTC"}]}
 ```
 
-if you get this, you should wait a bit until the hacker container is up:
+This shows, that the rogue hacker service can still access the catalogue service. The hacker will be authenticated, 
+but as the rules are permissive, still has access. 
+
+If you get an error like the following, you should wait a bit longer until the hacker container is up:
+
 ```
 error: expected 'logs (POD | TYPE/NAME) [CONTAINER_NAME]'.
 POD or TYPE/NAME is a required argument for the logs command
 See 'kubectl logs -h' for help and examples.
 ```
-
-This shows, that the rogue hacker service can still access the catalogue service. The hacker will be authenticated, 
-but as the rules are permissive, still has access. 
 
 #### Get Authorizations right
 
