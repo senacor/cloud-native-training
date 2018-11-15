@@ -134,6 +134,8 @@ Be aware that the service does not have the version: in the selector, only the d
 
 Redeploy the modifications and open the sock-shop again in your browser. It should still work. 
 If not, make sure you got the selectors in the services right.
+
+For more background see https://istio.io/docs/setup/kubernetes/spec-requirements/
  
 ## Optional Step 3 - Let's do Tracing!
 
