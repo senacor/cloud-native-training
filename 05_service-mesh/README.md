@@ -41,13 +41,7 @@ First make sure your services are still running. Access the sock-shop in the bro
 
 Next, you will migrate your front-end and catalogue services with istio. 
 
-There is a problem with istio concerning the catalogue-db service. This service uses TCP connections and this seems
-to be a problem with the current version of istio. Actually the problem is that ISTIO is trying to be too smart. By default
-it activates a so called mutual TLS feature and falls back to plain connections if this doesn't work. This feature works
-well with HTTP and other protocols which ISTIO knows, but for plain TCP this fails resulting in garbeled connections. 
-We will fix that in a later step.
-
-For the deployments front-end, catalogue and catalog-db, inject the istio sidecar into the deployment like this:
+For the deployments front-end, catalogue and catalog-db, inject the istio sidecar into the deployment by executing the following steps:
 
 ```
 kubectl get deployment catalogue -o yaml | istioctl kube-inject -f - | kubectl apply -f -
@@ -71,6 +65,7 @@ Still one more thing to do. The catalogue-db service needs some special handling
 kubectl apply -f catalogue-db-policy.yaml
 ```
 
+This step is required to make the catalogue-db service work with istio, as it is a TCP service. 
 Now check that the sock-shop still works, before doing the part:
 
 #### Make sure your Deployments match the ISTIO Requirements 
