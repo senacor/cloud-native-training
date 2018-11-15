@@ -3,12 +3,12 @@
 In this exercise you will be installing the ISTIO service mesh in your kubernetes installation on minikube and use
 some of its features in combination with your sock-shop setup:
 
-* Deploy ISTIO (Required Step 1)
-* Tracing (Optional Step 2)
-* A/B Deployments (Optional Step 3)
-* Authentication and Authorization (Optional Step 4 and 5)
+* Deploy ISTIO and Migrate Sock-Shop (Required Step 1 and 2)
+* Tracing (Optional Step 3)
+* A/B Deployments (Optional Step 4)
+* Authentication and Authorization (Optional Step 5 and 6)
 
-The Steps 2 until 5 are optional. You can either do Tracing, A/B Deployments
+The Steps 3 until 6 are optional. You can either do Tracing, A/B Deployments
 or Authentication and Authorization or all of them if you like. The last one is the most difficult.
 
 You can do them in any order, but if you do Authorization you must first complete Authentication. 
@@ -32,7 +32,7 @@ all pods should be in status Running or Completed.
 5. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
 all pods should be in status Running or Completed. Again don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
 
-## Required Step 2 - Enable ISTIO for your Deployments
+## Required Step 2 - Migrate Sock-Shop to ISTIO 
 
 This step is about migrating the sock-shop application to istio. This is necessary as istio requires to modify the deployments, 
 so we need to install them again.
@@ -274,7 +274,7 @@ Again deploy the modified file with `kubectl apply -f catalogue-virtual-service.
 
 Now check the sock-shop again. It should work again, but the simple hacking should still be blocked. 
 
-## Optional Step 5 - Enable Authorization
+## Optional Step 6 - Enable Authorization
 
 Now lets play with authorization. This only works if you turned on Authentication already. If not, do that step first. 
 
