@@ -19,18 +19,17 @@ You can use your AWS installation for all exercises.
 
 Deploy istio service mesh in your kubernetes.
 
-#### First startup minikube and connect to it:
+#### Preparation
 
-1. Make sure your minikube instance is started and your docker environment is connected as `minikube docker-env` says
-2. Run the cloudnative_bash docker image to get a shell and have the `kubectl` command available 
-3. Make sure the minikube is started completely. You can check by executing `kubectl get pods --all-namespaces`, 
-all pods should be in status Running or Completed. Don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
-4. Make sure your sock-shop is still running by connecting it from your browser.
+1. Run the cloudnative_bash docker image to get a shell and have the `kubectl` command available 
+2. Make sure the AWS kubernetes cluster is in good health. You can check by executing `kubectl get pods --all-namespaces`, 
+all pods should be in status Running or Completed. 
+3. Make sure your sock-shop is still running by connecting it from your browser.
 
 #### Next deploy ISTIO
 
-5. Run the script `deploy_istio.sh` from this folder. It will install istio in your minikube cluster
-6. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
+4. Run the script `deploy_istio.sh` from this folder. It will install istio in your minikube cluster
+5. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
 all pods should be in status Running or Completed. Again don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
 
 ## Required Step 2 - Enable ISTIO for your Deployments
