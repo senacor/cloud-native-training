@@ -28,7 +28,7 @@ all pods should be in status Running or Completed.
 
 #### Next deploy ISTIO
 
-4. Run the script `deploy_istio.sh` from this folder. It will install istio in your minikube cluster
+4. Run the script `deploy_istio.sh` from this folder. It will install istio in your kubernetes cluster
 5. Wait until the istio services are started completely. You can check by executing `kubectl get pods --all-namespaces`, 
 all pods should be in status Running or Completed. Again don't worry if some show Error or CrashLoopBackOff, just relax and wait. 
 
