@@ -237,6 +237,8 @@ Enable Authentication by modifying the file `catalogue-virtual-service.yaml`.
 You need to enable mutual TLS by adding ISTIO_MUTUAL to the DestinationRule like shown below and deploy it with 
 `kubectl apply -f catalogue-virtual-service.yaml`.
 
+This is how the DestinationRule must be defined as:
+
 ```
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -259,7 +261,7 @@ curl: (56) Recv failure: Connection reset by peer
 Good, simple hacking disabled! But lets see if the sock-shop is still working. I think not...
 
 To fix that we need to make sure that the front-end deployment also enables mutual TLS when communicating with the catalogue service.
-To do so, add the policy in file catalogue-virtual-service.yaml like this:
+To do so, replace the policy in file catalogue-virtual-service.yaml with this:
 
 ```
 apiVersion: "authentication.istio.io/v1alpha1"
