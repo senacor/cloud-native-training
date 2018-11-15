@@ -71,21 +71,20 @@ Now check that the sock-shop still works, before doing the part:
 #### Make sure your Deployments match the ISTIO Requirements 
 
 Before proceeding to one of the following optional steps, make sure your deployments and service follow the ISTIO requirements.
-See https://istio.io/docs/setup/kubernetes/spec-requirements/ and fix your deployments.
 
-Basically the requirements are about having certain labels. Make sure you also fix the selectors in the service
-definitions, otherwise you might break the sock-shop.
+Basically the requirements are about having certain labels. 
 
 In short: your yaml files must define labels app: and version: for your deployments and services. Make sure to also fix the 
 service selector correctly. Also make sure the ports in catalogue and catalogue-db are named "http".
 
-Example:
+Example for Deployment:
 
 ```
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
+###### note the labels here ######
   labels:
     app: catalogue
   name: catalogue
@@ -95,6 +94,7 @@ spec:
   template:
     metadata:
       creationTimestamp: null
+###### note the labels here ######
       labels:
         app: catalogue
         version: v1
@@ -104,29 +104,33 @@ spec:
 
 Note that the deployment has the version only in the template, not on the deployment itself.
 
-And the service must match, example:
+Example for Service:
+
 ```
 apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: null
+###### note the labels here ######
   labels:
     app: catalogue
   name: catalogue
 spec:
   type: NodePort
   ports:
+###### note the name here ######
   - name: "http"
     port: 80
     targetPort: 80
     protocol: TCP
+###### note the selector here ######    
   selector:
     app: catalogue
 status:
   loadBalancer: {}
 ```
 
-Note that the service does not show the version in the selector, only the deployment.
+Be aware that the service does not have the version: in the selector, only the deployment.
 
 Redeploy the modifications and open the sock-shop again in your browser. It should still work. 
 If not, make sure you got the selectors in the services right.
