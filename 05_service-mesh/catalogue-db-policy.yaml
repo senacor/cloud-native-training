@@ -1,0 +1,39 @@
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "catalogue-db"
+spec:
+  targets:
+  - name: catalogue-db
+  peers:
+  - mtls: {}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: catalogue-db
+spec:
+  hosts:
+  - catalogue-db
+  tcp:
+  - match:
+    - port: 3306
+    route:
+    - destination:
+        host: catalogue-db
+        port:
+          number: 3306
+  http:
+  - route:
+    - destination:
+        host: catalogue-db
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: catalogue-db
+spec:
+  host: catalogue-db
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

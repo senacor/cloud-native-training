@@ -1,0 +1,9 @@
+zones:
+  - eu-central-1a
+  - eu-central-1b
+  - eu-central-1c
+
+storage:
+  classProvisioner: kubernetes.io/aws-ebs
+
+use-ssl: false

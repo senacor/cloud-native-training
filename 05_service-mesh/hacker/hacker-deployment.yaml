@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: hacker
+    version: v1
+  name: hacker
+  namespace: hacker
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hacker
+    spec:
+      containers:
+      - image: weaveworksdemos/front-end:0.3.12
+        name: hacker
+        resources: {}
+        command:
+        - /bin/sh
+        args:
+        - '-c'
+        - 'while true; do echo hacking catalogue; wget -O- http://catalogue.sock-shop.svc.cluster.local/health; sleep 1; done'
+      hostname: hacker
+      restartPolicy: Always
+status: {}

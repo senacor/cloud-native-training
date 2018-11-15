@@ -1,0 +1,14 @@
+image:
+  tag: "6.1.3"
+
+service:
+  type: LoadBalancer
+  externalPort: 80
+
+files:
+  kibana.yml:
+    elasticsearch.url: http://elasticsearch-elasticsearch-cluster:9200
+    server.port: 5601
+    logging.verbose: "true"
+    server.defaultRoute: "/app/kibana"
+

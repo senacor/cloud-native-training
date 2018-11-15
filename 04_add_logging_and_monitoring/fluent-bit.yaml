@@ -1,0 +1,13 @@
+image:
+  fluent_bit:
+    repository: fluent/fluent-bit
+    tag: 0.14.4
+backend:
+  type: es
+  es:
+    host: elasticsearch-elasticsearch-cluster
+    port: 9200
+    index: kubernetes_cluster
+    logstash_prefix: kubernetes_cluster
+rbac:
+  create: true
