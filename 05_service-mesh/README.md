@@ -3,18 +3,17 @@
 In this exercise you will be installing the ISTIO service mesh in your kubernetes installation on minikube and use
 some of its features in combination with your sock-shop setup:
 
-* Tracing
-* A/B Deployments
-* Authentication and Authorization
+* Deploy ISTIO (Required Step 1)
+* Tracing (Optional Step 2)
+* A/B Deployments (Optional Step 3)
+* Authentication and Authorization (Optional Step 4 and 5)
 
-The 3 exercise groups are optional. You can either do Tracing, A/B Deployments
-or Authentication and Authorization. The last one is the most difficult one.
+The Steps 2 until 5 are optional. You can either do Tracing, A/B Deployments
+or Authentication and Authorization or all of them if you like. The last one is the most difficult.
 
-You can do them in any order, but you must do first Authentication, next Authorization. 
-
+You can do them in any order, but if you do Authorization you must first complete Authentication. 
 
 You can use your AWS installation for all exercises.
-
 
 ## Required Step 1 - Deploy ISTIO
 
