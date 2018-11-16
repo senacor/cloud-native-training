@@ -1,0 +1,5 @@
+alertmanager:
+  service:
+    type: LoadBalancer
+
+

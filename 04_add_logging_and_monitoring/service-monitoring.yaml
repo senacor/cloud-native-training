@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: catalogue
+  labels:
+    name: catalogue
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: catalogue
+  endpoints:
+  - port: http
