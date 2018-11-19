@@ -75,7 +75,7 @@ Before proceeding to one of the following optional steps, make sure your deploym
 Basically the requirements are about having certain labels. 
 
 In short: your yaml files must define labels app: and version: for your deployments and services. Make sure to also fix the 
-service selector correctly. Also make sure the ports in catalogue and catalogue-db are named "http".
+service selector correctly. Also make sure the ports in catalogue and front-end are named "http". Make sure the port in catalogue-db IS NOT named "http". Make it unnamed or name it "tcp" if you prefer.
 
 Example for Deployment:
 
